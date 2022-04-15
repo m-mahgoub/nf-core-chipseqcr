@@ -1,7 +1,7 @@
 {
     "$schema": "http://json-schema.org/draft-07/schema",
-    "$id": "https://raw.githubusercontent.com/nf-core/chipseqcr/master/nextflow_schema.json",
-    "title": "nf-core/chipseqcr pipeline parameters",
+    "$id": "https://raw.githubusercontent.com/m-mahgoub/nf-core-chipseqcr/master/nextflow_schema.json",
+    "title": "m-mahgoub/nf-core-chipseqcr pipeline parameters",
     "description": "Nextflow pipeline for ChIP-seq and CUT&RUN analysis based on an nf-core template",
     "type": "object",
     "definitions": {

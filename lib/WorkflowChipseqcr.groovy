@@ -1,5 +1,5 @@
 //
-// This file holds several functions specific to the workflow/chipseqcr.nf in the nf-core/chipseqcr pipeline
+// This file holds several functions specific to the workflow/chipseqcr.nf in the m-mahgoub/nf-core-chipseqcr pipeline
 //
 
 class WorkflowChipseqcr {

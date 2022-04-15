@@ -1,5 +1,5 @@
 name: Feature request
-description: Suggest an idea for the nf-core/chipseqcr pipeline
+description: Suggest an idea for the m-mahgoub/nf-core-chipseqcr pipeline
 labels: enhancement
 body:
   - type: textarea

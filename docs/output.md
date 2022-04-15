@@ -1,4 +1,4 @@
-# nf-core/chipseqcr: Output
+# m-mahgoub/nf-core-chipseqcr: Output
 
 ## Introduction
 

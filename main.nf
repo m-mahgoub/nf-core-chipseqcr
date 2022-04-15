@@ -1,11 +1,9 @@
 #!/usr/bin/env nextflow
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    nf-core/chipseqcr
+    m-mahgoub/nf-core-chipseqcr
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    Github : https://github.com/nf-core/chipseqcr
-    Website: https://nf-co.re/chipseqcr
-    Slack  : https://nfcore.slack.com/channels/chipseqcr
+    Github : https://github.com/m-mahgoub/nf-core-chipseqcr
 ----------------------------------------------------------------------------------------
 */
 
@@ -36,7 +34,7 @@ WorkflowMain.initialise(workflow, params, log)
 include { CHIPSEQCR } from './workflows/chipseqcr'
 
 //
-// WORKFLOW: Run main nf-core/chipseqcr analysis pipeline
+// WORKFLOW: Run main m-mahgoub/nf-core-chipseqcr analysis pipeline
 //
 workflow NFCORE_CHIPSEQCR {
     CHIPSEQCR ()
