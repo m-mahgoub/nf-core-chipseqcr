@@ -1,7 +1,0 @@
-Sample	PE mapped uniquely	PE mapped discordantly uniquely	PE one mate mapped uniquely	PE multimapped	PE one mate multimapped	PE neither mate aligned
-SPT5_INPUT_REP1	7.0	0.0	43.0	7.0	18.5	99924.5
-SPT5_INPUT_REP2	12.0	0.0	41.5	7.0	35.0	99904.5
-SPT5_T0_REP1	224.0	26.0	198.5	60.0	95.0	99396.5
-SPT5_T0_REP2	196.0	28.0	263.0	65.0	110.5	99337.5
-SPT5_T15_REP1	186.0	17.0	201.0	41.0	84.5	99470.5
-SPT5_T15_REP2	136.0	29.0	169.5	40.0	73.0	99552.5

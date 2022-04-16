@@ -1,2 +1,0 @@
-task_id	hash	native_id	name	status	exit	submit	duration	realtime	%cpu	peak_rss	peak_vmem	rchar	wchar
-1	77/cd60cf	86187	NFCORE_CHIPSEQCR:CHIPSEQCR:INPUT_CHECK:SAMPLESHEET_CHECK (test-GSE145187-small.csv)	COMPLETED	0	2022-04-16 10:24:07.076	2.4s	0ms	57.1%	2.8 MB	11 MB	533.5 KB	875 B
