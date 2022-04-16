@@ -1,0 +1,14 @@
+BOWTIE2_ALIGN:
+  bowtie2: 2.4.4
+  pigz: '2.6'
+  samtools: 1.15.1
+CUSTOM_DUMPSOFTWAREVERSIONS:
+  python: 3.9.5
+  yaml: 5.4.1
+FASTQC:
+  fastqc: 0.11.9
+SAMPLESHEET_CHECK:
+  python: 3.8.3
+Workflow:
+  Nextflow: 21.10.6
+  m-mahgoub/nf-core-chipseqcr: 1.0dev
