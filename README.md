@@ -1,4 +1,5 @@
-# ![m-mahgoub/nf-core-chipseqcr](docs/images/m-mahgoub/nf-core-chipseqcr_logo_light.png#gh-light-mode-only) ![m-mahgoub/nf-core-chipseqcr](docs/images/m-mahgoub/nf-core-chipseqcr_logo_dark.png#gh-dark-mode-only)
+# chipseqcr (ChIP-seq & CUT&RUN Pipeline)
+<!-- # ![m-mahgoub/nf-core-chipseqcr](docs/images/m-mahgoub/nf-core-chipseqcr_logo_light.png#gh-light-mode-only) ![m-mahgoub/nf-core-chipseqcr](docs/images/m-mahgoub/nf-core-chipseqcr_logo_dark.png#gh-dark-mode-only) -->
 
 
 [![Nextflow](https://img.shields.io/badge/nextflow%20DSL2-%E2%89%A521.10.3-23aa62.svg?labelColor=000000)](https://www.nextflow.io/)
