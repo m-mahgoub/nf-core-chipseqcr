@@ -11,12 +11,19 @@ WorkflowChipseqcr.initialise(params, log)
 
 // TODO nf-core: Add all file path parameters for the pipeline to the list below
 // Check input path parameters to see if they exist
-def checkPathParamList = [ params.input, params.multiqc_config, params.fasta, params.bowtie2 ]
+def checkPathParamList = [ params.input, params.multiqc_config, params.fasta ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
 // Check mandatory parameters
-if (params.input) { ch_input = file(params.input) } else { exit 1, 'Input samplesheet not specified!' }
-if (params.bowtie2) { ch_index = params.bowtie2 } else { exit 1, 'Bowtie Index not specified!' }
+
+// Check Input Sample Sheet
+if (params.input) { ch_input = file(params.input) } 
+else { exit 1, 'Input samplesheet not specified!' }
+
+// Check either Bowtie2 index or Genome fasta files are provided
+if (params.bowtie2) { bowtie2index_user =  params.bowtie2}
+else if (params.fasta) { ch_fasta = file(params.fasta) }
+else { exit 1, "Neither Bowtie2 Index nor Genome Fasta are specified! Provide at least one of these options via '--fasta genome.fa' or '--bowtie2 path/to/bowtie2/index' or via a detectable config file." }
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -51,6 +58,7 @@ include { FASTQC                      } from '../modules/nf-core/modules/fastqc/
 include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
 include { BOWTIE2_ALIGN } from '../modules/nf-core/modules/bowtie2/align/main'
+include { BOWTIE2_BUILD } from '../modules/nf-core/modules/bowtie2/build/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -82,14 +90,30 @@ workflow CHIPSEQCR {
     ch_versions = ch_versions.mix(FASTQC.out.versions.first())
 
     //
-    // MODULE: Run Bowtie2 Mapping
+    // MODULE: Run Bowtie2 Alignment
     //
+
+    // If Bowtie2 Index is not provides, Build it from fasta:
+    if (!params.bowtie2 && params.fasta) {
+       BOWTIE2_BUILD(ch_fasta)
+       bowtie2index_fasta = BOWTIE2_BUILD.out.index
+       ch_versions = ch_versions.mix(BOWTIE2_BUILD.out.versions)
+    }
+
+    // Set Bowtie2 Index Chnannel based on provided input
+    if (params.bowtie2) { ch_index = bowtie2index_user}
+    else if (!params.bowtie2 && params.fasta)  { ch_index =  bowtie2index_fasta }
+
+    // Perform Bowtie2 Alignment
     BOWTIE2_ALIGN (
         INPUT_CHECK.out.reads,
         ch_index,
-        true  // whether to dump unmapped reads
+        false  // whether to dump unmapped reads
     )
     ch_versions = ch_versions.mix(BOWTIE2_ALIGN.out.versions.first())
+
+    // Run Bowtie2 Indexing and then Aligment If Bowtie Index not provided
+    // Genome Fasta is frequired in this case
 
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
