@@ -12,6 +12,9 @@
             "custom/dumpsoftwareversions": {
                 "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
             },
+            "deeptools/bamcoverage": {
+                "git_sha": "fe088745e03f21d07477cc0c655c24ae9f72ac31"
+            },
             "fastqc": {
                 "git_sha": "e745e167c1020928ef20ea1397b6b4d230681b4d"
             },

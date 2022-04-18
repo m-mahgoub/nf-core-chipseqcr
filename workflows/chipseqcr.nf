@@ -62,6 +62,8 @@ include { BOWTIE2_BUILD               } from '../modules/nf-core/modules/bowtie2
 include { SAMTOOLS_SORT               } from '../modules/nf-core/modules/samtools/sort/main'
 include { SAMTOOLS_INDEX              } from '../modules/nf-core/modules/samtools/index/main'
 include { MACS2_CALLPEAK              } from '../modules/nf-core/modules/macs2/callpeak/main'
+include { DEEPTOOLS_BAMCOVERAGE       } from '../modules/nf-core/modules/deeptools/bamcoverage/main'
+
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
@@ -128,6 +130,16 @@ workflow CHIPSEQCR {
         SAMTOOLS_SORT.out.bam
     )
 
+
+    //
+    // Channel Operation: Make A channel emitting bam and bai index of each sample
+    //
+    SAMTOOLS_SORT
+    .out
+    .bam
+    .join (SAMTOOLS_INDEX.out.bai, by: [0])
+    .set { ch_bam_bai }
+
     //
     // Channel Operation: Make A channel for control samples only
     //
@@ -182,6 +194,14 @@ workflow CHIPSEQCR {
     )
     ch_versions = ch_versions.mix(MACS2_CALLPEAK.out.versions.first())
 
+    //
+    // MODULE: Run Deeptools bamCoverage
+    //
+    DEEPTOOLS_BAMCOVERAGE (
+        ch_bam_bai
+    )
+    ch_versions = ch_versions.mix(DEEPTOOLS_BAMCOVERAGE.out.versions.first())
+
     // #####################################################################################################################################
     // #####################################################################################################################################
     // #####################################################################################################################################
@@ -220,7 +240,7 @@ workflow CHIPSEQCR {
 
 
     // Emit for testing purpose
-    emit:ch_ip_control_bam
+    emit:ch_bam_bai
 }
 
 /*
