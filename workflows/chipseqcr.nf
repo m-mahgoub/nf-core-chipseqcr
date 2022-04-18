@@ -139,6 +139,10 @@ workflow CHIPSEQCR {
     )
     multiqc_report = MULTIQC.out.report.toList()
     ch_versions    = ch_versions.mix(MULTIQC.out.versions)
+
+    // Emit for testing purpose
+    ch_test = BOWTIE2_ALIGN.out.bam
+    emit: ch_test
 }
 
 /*

@@ -38,6 +38,8 @@ include { CHIPSEQCR } from './workflows/chipseqcr'
 //
 workflow NFCORE_CHIPSEQCR {
     CHIPSEQCR ()
+    // Emit for testing purpose
+    emit: CHIPSEQCR.out
 }
 
 /*
@@ -52,6 +54,8 @@ workflow NFCORE_CHIPSEQCR {
 //
 workflow {
     NFCORE_CHIPSEQCR ()
+    // emit ch_test from imported workflow
+    NFCORE_CHIPSEQCR.out.view()
 }
 
 /*
