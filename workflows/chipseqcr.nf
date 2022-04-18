@@ -60,8 +60,8 @@ include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/
 include { BOWTIE2_ALIGN               } from '../modules/nf-core/modules/bowtie2/align/main'
 include { BOWTIE2_BUILD               } from '../modules/nf-core/modules/bowtie2/build/main'
 include { SAMTOOLS_SORT               } from '../modules/nf-core/modules/samtools/sort/main'
-include { SAMTOOLS_INDEX               } from '../modules/nf-core/modules/samtools/index/main'
-
+include { SAMTOOLS_INDEX              } from '../modules/nf-core/modules/samtools/index/main'
+include { MACS2_CALLPEAK              } from '../modules/nf-core/modules/macs2/callpeak/main'
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
     RUN MAIN WORKFLOW
@@ -142,7 +142,22 @@ workflow CHIPSEQCR {
     .set { ch_control_bam_bai }
 
     //
-    // Channel Operation: Make A channel with each sample's bam/bai matched to its control's bam/bai
+    // Channel Operation: Make A channel with each IP's bam matched to its control's bam (No bai)
+    //
+    SAMTOOLS_SORT
+    .out
+    .bam
+    .join (SAMTOOLS_INDEX.out.bai, by: [0])
+    .map {
+        meta, bam, bai ->
+            meta.control ? [ meta.control, meta,  [ bam ] ,  [ bai ] ] : null
+    }
+    .combine(ch_control_bam_bai, by: 0)
+    .map { it -> [ it[1] , it[2] , it[4]] }
+    .set { ch_ip_control_bam }
+
+    //
+    // Channel Operation: Make A channel with each IP's bam/bai matched to its control's bam/bai
     //
     SAMTOOLS_SORT
     .out
@@ -154,36 +169,57 @@ workflow CHIPSEQCR {
     }
     .combine(ch_control_bam_bai, by: 0)
     .map { it -> [ it[1] , it[2] + it[4], it[3] + it[5] ] }
-    .set { ch_sample_control_bam_bai }
-    // Credit for the above two channel operations for nf-core chipseq
+    .set { ch_ip_control_bam_bai }
+    // Credit for the code of the above two channel operations for nf-core chipseq
     // https://github.com/nf-core/chipseq/blob/813cb384f51901202ff1e937846a6ece4dd199b3/workflows/chipseq.nf
 
-    CUSTOM_DUMPSOFTWAREVERSIONS (
-        ch_versions.unique().collectFile(name: 'collated_versions.yml')
-    )
-
     //
-    // MODULE: MultiQC
+    // MODULE: Run MACS2 Peak Calling
     //
-    workflow_summary    = WorkflowChipseqcr.paramsSummaryMultiqc(workflow, summary_params)
-    ch_workflow_summary = Channel.value(workflow_summary)
-
-    ch_multiqc_files = Channel.empty()
-    ch_multiqc_files = ch_multiqc_files.mix(Channel.from(ch_multiqc_config))
-    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-    ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
-    ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(BOWTIE2_ALIGN.out.log.collect{it[1]}.ifEmpty([]))
-
-    MULTIQC (
-        ch_multiqc_files.collect()
+    MACS2_CALLPEAK (
+        ch_ip_control_bam,
+        params.gsize
     )
-    multiqc_report = MULTIQC.out.report.toList()
-    ch_versions    = ch_versions.mix(MULTIQC.out.versions)
+    ch_versions = ch_versions.mix(MACS2_CALLPEAK.out.versions.first())
+
+    // #####################################################################################################################################
+    // #####################################################################################################################################
+    // #####################################################################################################################################
+    // #####################################################################################################################################
+
+    // CUSTOM_DUMPSOFTWAREVERSIONS (
+    //     ch_versions.unique().collectFile(name: 'collated_versions.yml')
+    // )
+
+    // //
+    // // MODULE: MultiQC
+    // //
+    // workflow_summary    = WorkflowChipseqcr.paramsSummaryMultiqc(workflow, summary_params)
+    // ch_workflow_summary = Channel.value(workflow_summary)
+
+    // ch_multiqc_files = Channel.empty()
+    // ch_multiqc_files = ch_multiqc_files.mix(Channel.from(ch_multiqc_config))
+    // ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
+    // ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
+    // ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
+    // ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
+    // ch_multiqc_files = ch_multiqc_files.mix(BOWTIE2_ALIGN.out.log.collect{it[1]}.ifEmpty([]))
+
+    // MULTIQC (
+    //     ch_multiqc_files.collect()
+    // )
+    // multiqc_report = MULTIQC.out.report.toList()
+    // ch_versions    = ch_versions.mix(MULTIQC.out.versions)
+
+    // #####################################################################################################################################
+    // #####################################################################################################################################
+    // #####################################################################################################################################
+    // #####################################################################################################################################
+
+
 
     // Emit for testing purpose
-    emit:ch_sample_control_bam_bai
+    emit:ch_ip_control_bam
 }
 
 /*
