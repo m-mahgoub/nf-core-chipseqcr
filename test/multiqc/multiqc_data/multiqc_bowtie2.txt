@@ -1,0 +1,7 @@
+Sample	total_reads	paired_total	paired_aligned_none	paired_aligned_one	paired_aligned_multi	paired_aligned_discord_one	paired_aligned_mate_none	paired_aligned_mate_one	paired_aligned_mate_multi	overall_alignment_rate	paired_aligned_mate_multi_halved	paired_aligned_mate_none_halved	paired_aligned_mate_one_halved
+SPT5_INPUT_rep1	100000	100000	5834	80910	13256	3	11531	81	50	94.23	25.0	5765.5	40.5
+SPT5_INPUT_rep2	100000	100000	3693	84075	12232	20	7200	102	44	96.4	22.0	3600.0	51.0
+SPT5_T0_rep1	100000	100000	39855	32018	28127	6296	53461	1491	12166	73.27	6083.0	26730.5	745.5
+SPT5_T0_rep2	100000	100000	39329	27136	33535	6000	51637	1577	13444	74.18	6722.0	25818.5	788.5
+SPT5_T15_rep1	100000	100000	26776	45877	27347	6557	32306	1405	6727	83.85	3363.5	16153.0	702.5
+SPT5_T15_rep2	100000	100000	37124	40205	22671	8222	47962	1806	8036	76.02	4018.0	23981.0	903.0

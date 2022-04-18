@@ -17,7 +17,7 @@ for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true
 // Check mandatory parameters
 
 // Check Input Sample Sheet
-if (params.input) { ch_input = file(params.input) } 
+if (params.input) { ch_input = file(params.input) }
 else { exit 1, 'Input samplesheet not specified!' }
 
 // Check either Bowtie2 index or Genome fasta files are provided
@@ -57,8 +57,10 @@ include { INPUT_CHECK } from '../subworkflows/local/input_check'
 include { FASTQC                      } from '../modules/nf-core/modules/fastqc/main'
 include { MULTIQC                     } from '../modules/nf-core/modules/multiqc/main'
 include { CUSTOM_DUMPSOFTWAREVERSIONS } from '../modules/nf-core/modules/custom/dumpsoftwareversions/main'
-include { BOWTIE2_ALIGN } from '../modules/nf-core/modules/bowtie2/align/main'
-include { BOWTIE2_BUILD } from '../modules/nf-core/modules/bowtie2/build/main'
+include { BOWTIE2_ALIGN               } from '../modules/nf-core/modules/bowtie2/align/main'
+include { BOWTIE2_BUILD               } from '../modules/nf-core/modules/bowtie2/build/main'
+include { SAMTOOLS_SORT               } from '../modules/nf-core/modules/samtools/sort/main'
+include { SAMTOOLS_INDEX               } from '../modules/nf-core/modules/samtools/index/main'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -112,9 +114,49 @@ workflow CHIPSEQCR {
     )
     ch_versions = ch_versions.mix(BOWTIE2_ALIGN.out.versions.first())
 
-    // Run Bowtie2 Indexing and then Aligment If Bowtie Index not provided
-    // Genome Fasta is frequired in this case
+    //
+    // MODULE: Run Samtools Sort
+    //
+    SAMTOOLS_SORT (
+        BOWTIE2_ALIGN.out.bam
+    )
 
+    //
+    // MODULE: Run Samtools Index
+    //
+    SAMTOOLS_INDEX (
+        SAMTOOLS_SORT.out.bam
+    )
+
+    //
+    // Channel Operation: Make A channel for control samples only
+    //
+    SAMTOOLS_SORT
+    .out
+    .bam
+    .join (SAMTOOLS_INDEX.out.bai, by: [0])
+    .map {
+        meta, bam, bai ->
+            meta.control ? null : [ meta.id, [ bam ] , [ bai ] ]
+    }
+    .set { ch_control_bam_bai }
+
+    //
+    // Channel Operation: Make A channel with each sample's bam/bai matched to its control's bam/bai
+    //
+    SAMTOOLS_SORT
+    .out
+    .bam
+    .join (SAMTOOLS_INDEX.out.bai, by: [0])
+    .map {
+        meta, bam, bai ->
+            meta.control ? [ meta.control, meta,  [ bam ] ,  [ bai ] ] : null
+    }
+    .combine(ch_control_bam_bai, by: 0)
+    .map { it -> [ it[1] , it[2] + it[4], it[3] + it[5] ] }
+    .set { ch_sample_control_bam_bai }
+    // Credit for the above two channel operations for nf-core chipseq
+    // https://github.com/nf-core/chipseq/blob/813cb384f51901202ff1e937846a6ece4dd199b3/workflows/chipseq.nf
 
     CUSTOM_DUMPSOFTWAREVERSIONS (
         ch_versions.unique().collectFile(name: 'collated_versions.yml')
@@ -141,8 +183,7 @@ workflow CHIPSEQCR {
     ch_versions    = ch_versions.mix(MULTIQC.out.versions)
 
     // Emit for testing purpose
-    ch_test = BOWTIE2_ALIGN.out.bam
-    emit: ch_test
+    emit:ch_sample_control_bam_bai
 }
 
 /*
