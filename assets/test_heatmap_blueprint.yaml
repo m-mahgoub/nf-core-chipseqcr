@@ -1,0 +1,33 @@
+# 1. you can add as much as required plots (plot_1, Plot_2, Plot_3, etc)
+# 2. plot names should be unique
+# 3. Per individual plot, make sure the labels and file names are unique
+# 4. file path can be either local (full absolute path), or remote (HTTP/S or FTP)
+
+plot_1:
+    name: "Replicate_1"
+    bed:
+        - [sampleID: "SPT5_T0_rep1", label: "T0"]
+        - [ file: "https://raw.githubusercontent.com/m-mahgoub/test-datasets/main/cutnrun/bed/SPT5_T0_rep1_remote.bed", label: "T0_remote" ]
+        - [ sampleID: "SPT5_T15_rep1", label: "T15" ]
+        - [ file: "https://raw.githubusercontent.com/m-mahgoub/test-datasets/main/cutnrun/bed/SPT5_T15_rep1_remote.bed", label: "T15_remote" ]
+    bigwig:
+        - [ sampleID: "SPT5_T0_rep1", label: "T0" ]
+        - [ sampleID: "SPT5_INPUT_rep1", label: "T0 Input" ]
+        - [ file: "https://raw.githubusercontent.com/m-mahgoub/test-datasets/main/cutnrun/bigwig/SPT5_T0_rep1_remote.bigwig", label: "T0_remote" ]
+        - [ sampleID: "SPT5_T15_rep1", label: "T15" ]
+        - [ file: "https://raw.githubusercontent.com/m-mahgoub/test-datasets/main/cutnrun/bigwig/SPT5_T15_rep1_remote.bigwig", label: "T15_remote" ]
+
+
+plot_2:
+    name: "Replicate_2"
+    bed:
+        - [ sampleID: "SPT5_T0_rep2", label: "T0" ]
+        - [ file: "https://raw.githubusercontent.com/m-mahgoub/test-datasets/main/cutnrun/bed/SPT5_T0_rep2_remote.bed", label: "T0_remote" ]
+        - [ sampleID: "SPT5_T15_rep2", label: "T15" ]
+        - [ file: "https://raw.githubusercontent.com/m-mahgoub/test-datasets/main/cutnrun/bed/SPT5_T15_rep2_remote.bed", label: "T15_remote" ]
+    bigwig:
+        - [ sampleID: "SPT5_T0_rep2", label: "T0" ]
+        - [ sampleID: "SPT5_INPUT_rep2", label: "T0 Input" ]
+        - [ file: "https://raw.githubusercontent.com/m-mahgoub/test-datasets/main/cutnrun/bigwig/SPT5_T0_rep2_remote.bigwig", label: "T0_remote" ]
+        - [ sampleID: "SPT5_T15_rep2", label: "T15" ]
+        - [ file: "https://raw.githubusercontent.com/m-mahgoub/test-datasets/main/cutnrun/bigwig/SPT5_T15_rep2_remote.bigwig", label: "T15_remote" ]

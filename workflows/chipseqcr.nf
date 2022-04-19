@@ -14,6 +14,9 @@ WorkflowChipseqcr.initialise(params, log)
 def checkPathParamList = [ params.input, params.multiqc_config, params.fasta ]
 for (param in checkPathParamList) { if (param) { file(param, checkIfExists: true) } }
 
+// Check YAML file for Heatmaps Blueprint if params.custom_heatmap = true
+if (params.custom_heatmap) { file(params.heatmap_blueprint, checkIfExists: true) }
+
 // Check mandatory parameters
 
 // Check Input Sample Sheet
@@ -24,6 +27,9 @@ else { exit 1, 'Input samplesheet not specified!' }
 if (params.bowtie2) { bowtie2index_user =  params.bowtie2}
 else if (params.fasta) { ch_fasta = file(params.fasta) }
 else { exit 1, "Neither Bowtie2 Index nor Genome Fasta are specified! Provide at least one of these options via '--fasta genome.fa' or '--bowtie2 path/to/bowtie2/index' or via a detectable config file." }
+
+// Construct Channels from Config files
+if (params.custom_heatmap) { ch_blueprint = file(params.heatmap_blueprint) }
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -43,7 +49,9 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 //
 // SUBWORKFLOW: Consisting of a mix of local and nf-core/modules
 //
-include { INPUT_CHECK } from '../subworkflows/local/input_check'
+include { INPUT_CHECK             } from '../subworkflows/local/input_check'
+include { HEATMAP_BLUEPRINT       } from '../modules/local/heatmap_blueprint'
+include { DEEPTOOLS_COMPUTEMATRIX } from '../modules/local/deeptools_computematrix'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -202,35 +210,51 @@ workflow CHIPSEQCR {
     )
     ch_versions = ch_versions.mix(DEEPTOOLS_BAMCOVERAGE.out.versions.first())
 
-    // #####################################################################################################################################
-    // #####################################################################################################################################
-    // #####################################################################################################################################
-    // #####################################################################################################################################
-
-    CUSTOM_DUMPSOFTWAREVERSIONS (
-        ch_versions.unique().collectFile(name: 'collated_versions.yml')
-    )
-
     //
-    // MODULE: MultiQC
+    // Optional Subworkflow: if Heatmap Blueprint is provided
     //
-    workflow_summary    = WorkflowChipseqcr.paramsSummaryMultiqc(workflow, summary_params)
-    ch_workflow_summary = Channel.value(workflow_summary)
+    if (params.custom_heatmap) {
+        HEATMAP_BLUEPRINT (
+            ch_blueprint
+        )
+        ch_versions = ch_versions.mix(HEATMAP_BLUEPRINT.out.versions)
 
-    ch_multiqc_files = Channel.empty()
-    ch_multiqc_files = ch_multiqc_files.mix(Channel.from(ch_multiqc_config))
-    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-    ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
-    ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(BOWTIE2_ALIGN.out.log.collect{it[1]}.ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(MACS2_CALLPEAK.out.xls.collect{it[1]}.ifEmpty([]))
+        //
+        // Channel Operation: Make A channel that emits string of all bed and bigwig files' names
+                                // This is which is mix of files staged by path(bed) and path(local_remote_files)
+        //
 
-    MULTIQC (
-        ch_multiqc_files.collect()
-    )
-    multiqc_report = MULTIQC.out.report.toList()
-    ch_versions    = ch_versions.mix(MULTIQC.out.versions)
+    }
+
+    // #####################################################################################################################################
+    // #####################################################################################################################################
+    // #####################################################################################################################################
+    // #####################################################################################################################################
+
+    // CUSTOM_DUMPSOFTWAREVERSIONS (
+    //     ch_versions.unique().collectFile(name: 'collated_versions.yml')
+    // )
+
+    // //
+    // // MODULE: MultiQC
+    // //
+    // workflow_summary    = WorkflowChipseqcr.paramsSummaryMultiqc(workflow, summary_params)
+    // ch_workflow_summary = Channel.value(workflow_summary)
+
+    // ch_multiqc_files = Channel.empty()
+    // ch_multiqc_files = ch_multiqc_files.mix(Channel.from(ch_multiqc_config))
+    // ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
+    // ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
+    // ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
+    // ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
+    // ch_multiqc_files = ch_multiqc_files.mix(BOWTIE2_ALIGN.out.log.collect{it[1]}.ifEmpty([]))
+    // ch_multiqc_files = ch_multiqc_files.mix(MACS2_CALLPEAK.out.xls.collect{it[1]}.ifEmpty([]))
+
+    // MULTIQC (
+    //     ch_multiqc_files.collect()
+    // )
+    // multiqc_report = MULTIQC.out.report.toList()
+    // ch_versions    = ch_versions.mix(MULTIQC.out.versions)
 
     // #####################################################################################################################################
     // #####################################################################################################################################
@@ -240,7 +264,8 @@ workflow CHIPSEQCR {
 
 
     // Emit for testing purpose
-    emit:ch_bam_bai
+    // emit: ch_bam_bai
+    emit: Channel.empty()
 }
 
 /*
