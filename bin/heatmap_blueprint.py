@@ -7,7 +7,6 @@ import pandas as pd
 with open(sys.argv[1], 'r') as file:
     yaml_dict = yaml.safe_load(file)
 
-
 all_info_as_dictionary = {}
 file_paths_list = []  # local and remote paths for all plots, not including files generated in the workflow
 
