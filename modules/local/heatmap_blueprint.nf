@@ -9,8 +9,8 @@ process HEATMAP_BLUEPRINT {
     input:
         path(heatmap_blueprint) // user defined file for plotting strategy in YAML format in “assets/heatmap_blueprint.yaml”
     output:
-    path 'names_labels_for_deeptools.txt' , emit: str_file_deeptool
-    path 'local_remote_paths_for_deeptools.txt' , emit: path_file_deeptool
+    path 'names_labels_for_deeptools.txt' , emit: str_for_deeptool
+    path 'local_remote_paths_for_deeptools.txt' , emit: path_for_deeptool
     path  "versions.yml"              , emit: versions
 
     when:

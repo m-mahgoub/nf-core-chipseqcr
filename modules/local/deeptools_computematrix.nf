@@ -7,17 +7,17 @@ process DEEPTOOLS_COMPUTEMATRIX {
         'quay.io/biocontainers/deeptools:3.5.1--py_0' }"
 
     input:
-        path(bed) // output bedfiles from MACS2_CALLPEAK
-        path(bigwig) // output bigwig from DEEPTOOLS_BAMCOVERAGE
-        path (local_remote_files) // paths for local or remote files (not generated in the pipline) to be staged
+    path bed // output bedfiles from MACS2_CALLPEAK
+    path bigwig // output bigwig from DEEPTOOLS_BAMCOVERAGE
+    path local_remote_files // paths for local or remote files (not generated in the pipline) to be staged
                                   // The paths for these files have to be explicitly specified in "assets/heatmap_blueprint.yaml"
-        tuple val(name), //
-              val (bed_name), // string of all bed files' names which is mix of files staged by path(bed) and path(local_remote_files)
-              val (bigwig_name), // string of all bigwig files' names which is mix of files staged by path(bigwig) and path(local_remote_files)
+    tuple val(name), //
+          val(bed_name), // string of all bed files' names which is mix of files staged by path(bed) and path(local_remote_files)
+          val(bigwig_name) // string of all bigwig files' names which is mix of files staged by path(bigwig) and path(local_remote_files)
     output:
-    path("*.mat.gz") , emit: matrix
-    path("*.mat.tab"), emit: table
-    path  "versions.yml"              , emit: versions
+    path "*.mat.gz"    , emit: matrix
+    path "*.mat.tab"   , emit: table
+    path "versions.yml" , emit: versions
 
     when:
     task.ext.when == null || task.ext.when

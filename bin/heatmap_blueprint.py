@@ -21,14 +21,18 @@ for plot, plot_meta in yaml_dict.items():
             for file_meta in user_list:
                 file_label = file_meta[1]['label']
                 file_source = list(file_meta[0].keys())[0]
-                
-                # bed file generated from the pipline
-                if file_source == 'sampleID':  
-                    file_name = file_meta[0][file_source] + '.' + key
+
+                # file generated from the pipline
+                if file_source == 'sampleID':
+                    if key == 'bed':
+                        extension = '_peaks.narrowPeak'
+                    elif key == 'bigwig':
+                        extension = '.bigWig'
+                    file_name = file_meta[0][file_source] + extension
                     if file_label == "":
                         file_label = file_meta[0][file_source]
-                
-                # bed file from local or remote path
+
+                # file from local or remote path
                 if file_source == 'file':
                     file_path = file_meta[0][file_source]
                     file_name = file_path.split('/')[-1]
