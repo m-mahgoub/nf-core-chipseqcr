@@ -1,5 +1,5 @@
 process HEATMAP_BLUEPRINT {
-    label 'process_very_low'
+    label 'process_short'
 
     conda (params.enable_conda ? 'bioconda::pyyaml=6.0 bioconda::pandas=1.4.1' : null)
     container "${ workflow.containerEngine == 'singularity' && !task.ext.singularity_pull_docker_container ?

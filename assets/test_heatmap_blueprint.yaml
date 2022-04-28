@@ -7,27 +7,27 @@ plot_1:
     name: "Replicate_1"
     bed:
         - [sampleID: "SPT5_T0_rep1", label: "T0"]
-        - [ file: "https://raw.githubusercontent.com/m-mahgoub/test-datasets/main/cutnrun/bed/SPT5_T0_rep1_remote.bed", label: "T0_remote" ]
+        - [ file: "https://raw.githubusercontent.com/m-mahgoub/test-datasets/main/cutnrun/bed/SPT5_T0_rep1_remote.bed", label: "T0 remote" ]
         - [ sampleID: "SPT5_T15_rep1", label: "T15" ]
-        - [ file: "https://raw.githubusercontent.com/m-mahgoub/test-datasets/main/cutnrun/bed/SPT5_T15_rep1_remote.bed", label: "T15_remote" ]
+        - [ file: "https://raw.githubusercontent.com/m-mahgoub/test-datasets/main/cutnrun/bed/SPT5_T15_rep1_remote.bed", label: "T15 remote" ]
     bigwig:
         - [ sampleID: "SPT5_T0_rep1", label: "T0" ]
         - [ sampleID: "SPT5_INPUT_rep1", label: "T0 Input" ]
-        - [ file: "https://raw.githubusercontent.com/m-mahgoub/test-datasets/main/cutnrun/bigwig/SPT5_T0_rep1_remote.bigwig", label: "T0_remote" ]
+        - [ file: "https://raw.githubusercontent.com/m-mahgoub/test-datasets/main/cutnrun/bigwig/SPT5_T0_rep1_remote.bigwig", label: "T0 remote" ]
         - [ sampleID: "SPT5_T15_rep1", label: "T15" ]
-        - [ file: "https://raw.githubusercontent.com/m-mahgoub/test-datasets/main/cutnrun/bigwig/SPT5_T15_rep1_remote.bigwig", label: "T15_remote" ]
+        - [ file: "https://raw.githubusercontent.com/m-mahgoub/test-datasets/main/cutnrun/bigwig/SPT5_T15_rep1_remote.bigwig", label: "T15 remote" ]
 
 
 plot_2:
     name: "Replicate_2"
     bed:
         - [ sampleID: "SPT5_T0_rep2", label: "T0" ]
-        - [ file: "https://raw.githubusercontent.com/m-mahgoub/test-datasets/main/cutnrun/bed/SPT5_T0_rep2_remote.bed", label: "T0_remote" ]
+        - [ file: "https://raw.githubusercontent.com/m-mahgoub/test-datasets/main/cutnrun/bed/SPT5_T0_rep2_remote.bed", label: "T0 remote" ]
         - [ sampleID: "SPT5_T15_rep2", label: "T15" ]
-        - [ file: "https://raw.githubusercontent.com/m-mahgoub/test-datasets/main/cutnrun/bed/SPT5_T15_rep2_remote.bed", label: "T15_remote" ]
+        - [ file: "https://raw.githubusercontent.com/m-mahgoub/test-datasets/main/cutnrun/bed/SPT5_T15_rep2_remote.bed", label: "T15 remote" ]
     bigwig:
         - [ sampleID: "SPT5_T0_rep2", label: "T0" ]
         - [ sampleID: "SPT5_INPUT_rep2", label: "T0 Input" ]
-        - [ file: "https://raw.githubusercontent.com/m-mahgoub/test-datasets/main/cutnrun/bigwig/SPT5_T0_rep2_remote.bigwig", label: "T0_remote" ]
+        - [ file: "https://raw.githubusercontent.com/m-mahgoub/test-datasets/main/cutnrun/bigwig/SPT5_T0_rep2_remote.bigwig", label: "T0 remote" ]
         - [ sampleID: "SPT5_T15_rep2", label: "T15" ]
-        - [ file: "https://raw.githubusercontent.com/m-mahgoub/test-datasets/main/cutnrun/bigwig/SPT5_T15_rep2_remote.bigwig", label: "T15_remote" ]
+        - [ file: "https://raw.githubusercontent.com/m-mahgoub/test-datasets/main/cutnrun/bigwig/SPT5_T15_rep2_remote.bigwig", label: "T15 remote" ]
