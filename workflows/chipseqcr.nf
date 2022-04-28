@@ -334,7 +334,7 @@ workflow CHIPSEQCR {
     // emit: ch_labels_for_deeptool
     // emit: ch_files_str_for_deeptool
     // emit: ch_heatmap_input
-    // emit: Channel.empty()
+    emit: Channel.empty()
 }
 
 /*
