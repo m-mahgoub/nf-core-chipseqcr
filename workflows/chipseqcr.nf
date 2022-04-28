@@ -52,6 +52,7 @@ ch_multiqc_custom_config = params.multiqc_config ? Channel.fromPath(params.multi
 include { INPUT_CHECK             } from '../subworkflows/local/input_check'
 include { HEATMAP_BLUEPRINT       } from '../modules/local/heatmap_blueprint'
 include { DEEPTOOLS_COMPUTEMATRIX } from '../modules/local/deeptools_computematrix'
+include { DEEPTOOLS_PLOTHEATMAP   } from '../modules/local/deeptools_plotheatmap'
 
 /*
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -248,6 +249,7 @@ workflow CHIPSEQCR {
         .map { row -> [ row.plot_name, row.bed_files_inLine, row.bigwig_files_inLine ] }
         .set { ch_files_str_for_deeptool }
 
+
         //
         // Channel Operation: Make A channel that emits paths for local or remote files (not generated in the pipline) to be staged
         //
@@ -264,6 +266,29 @@ workflow CHIPSEQCR {
             ch_files_str_for_deeptool
         )
         ch_versions = ch_versions.mix(DEEPTOOLS_COMPUTEMATRIX.out.versions)
+
+        //
+        // Channel Operation: Make A channel that emits string for labels of regions and samples, matched to matrix files
+        // 
+        
+        // (1) channel that emits string for labels of regions and samples only
+        HEATMAP_BLUEPRINT.out.str_for_deeptool
+        .splitCsv(header:true, sep:'\t')
+        .map { row -> [ row.plot_name, row.bed_labels_inLine_with_quotes, row.bigwig_labels_inLine_with_quotes ] }
+        .set { ch_labels_for_deeptool }
+        // (2) channel that emits plot name and assocaited matrix file
+        DEEPTOOLS_COMPUTEMATRIX.out.matrix
+        .map { it -> [ it.getSimpleName(), it ] }
+        .set { ch_matrix }
+        // (3) Join the two channels
+        ch_matrix
+        .join( ch_labels_for_deeptool )
+        .set { ch_heatmap_input }
+
+        DEEPTOOLS_PLOTHEATMAP (
+            ch_heatmap_input
+        )
+        ch_versions = ch_versions.mix(DEEPTOOLS_PLOTHEATMAP.out.versions)
     }
 
     // #####################################################################################################################################
@@ -271,30 +296,30 @@ workflow CHIPSEQCR {
     // #####################################################################################################################################
     // #####################################################################################################################################
 
-    CUSTOM_DUMPSOFTWAREVERSIONS (
-        ch_versions.unique().collectFile(name: 'collated_versions.yml')
-    )
+    // CUSTOM_DUMPSOFTWAREVERSIONS (
+    //     ch_versions.unique().collectFile(name: 'collated_versions.yml')
+    // )
 
-    //
-    // MODULE: MultiQC
-    //
-    workflow_summary    = WorkflowChipseqcr.paramsSummaryMultiqc(workflow, summary_params)
-    ch_workflow_summary = Channel.value(workflow_summary)
+    // //
+    // // MODULE: MultiQC
+    // //
+    // workflow_summary    = WorkflowChipseqcr.paramsSummaryMultiqc(workflow, summary_params)
+    // ch_workflow_summary = Channel.value(workflow_summary)
 
-    ch_multiqc_files = Channel.empty()
-    ch_multiqc_files = ch_multiqc_files.mix(Channel.from(ch_multiqc_config))
-    ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
-    ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
-    ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(BOWTIE2_ALIGN.out.log.collect{it[1]}.ifEmpty([]))
-    ch_multiqc_files = ch_multiqc_files.mix(MACS2_CALLPEAK.out.xls.collect{it[1]}.ifEmpty([]))
+    // ch_multiqc_files = Channel.empty()
+    // ch_multiqc_files = ch_multiqc_files.mix(Channel.from(ch_multiqc_config))
+    // ch_multiqc_files = ch_multiqc_files.mix(ch_multiqc_custom_config.collect().ifEmpty([]))
+    // ch_multiqc_files = ch_multiqc_files.mix(ch_workflow_summary.collectFile(name: 'workflow_summary_mqc.yaml'))
+    // ch_multiqc_files = ch_multiqc_files.mix(CUSTOM_DUMPSOFTWAREVERSIONS.out.mqc_yml.collect())
+    // ch_multiqc_files = ch_multiqc_files.mix(FASTQC.out.zip.collect{it[1]}.ifEmpty([]))
+    // ch_multiqc_files = ch_multiqc_files.mix(BOWTIE2_ALIGN.out.log.collect{it[1]}.ifEmpty([]))
+    // ch_multiqc_files = ch_multiqc_files.mix(MACS2_CALLPEAK.out.xls.collect{it[1]}.ifEmpty([]))
 
-    MULTIQC (
-        ch_multiqc_files.collect()
-    )
-    multiqc_report = MULTIQC.out.report.toList()
-    ch_versions    = ch_versions.mix(MULTIQC.out.versions)
+    // MULTIQC (
+    //     ch_multiqc_files.collect()
+    // )
+    // multiqc_report = MULTIQC.out.report.toList()
+    // ch_versions    = ch_versions.mix(MULTIQC.out.versions)
 
     // #####################################################################################################################################
     // #####################################################################################################################################
@@ -306,7 +331,10 @@ workflow CHIPSEQCR {
     // Emit for testing purpose
     // emit: ch_bed_all
     // emit: ch_bam_bai
-    emit: Channel.empty()
+    // emit: ch_labels_for_deeptool
+    // emit: ch_files_str_for_deeptool
+    emit: ch_heatmap_input
+    // emit: Channel.empty()
 }
 
 /*

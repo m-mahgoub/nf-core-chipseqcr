@@ -15,8 +15,7 @@ process DEEPTOOLS_COMPUTEMATRIX {
           val(bed_name), // string of all bed files' names which is mix of files staged by path(bed) and path(local_remote_files)
           val(bigwig_name) // string of all bigwig files' names which is mix of files staged by path(bigwig) and path(local_remote_files)
     output:
-    path "*.mat.gz"    , emit: matrix
-    path "*.mat.tab"   , emit: table
+    path "*.gz"    , emit: matrix
     path "versions.yml" , emit: versions
 
     when:
@@ -29,8 +28,7 @@ process DEEPTOOLS_COMPUTEMATRIX {
         $args \\
         --regionsFileName $bed_name \\
         --scoreFileName $bigwig_name \\
-        --outFileName ${name}.computeMatrix.mat.gz \\
-        --outFileNameMatrix ${name}.computeMatrix.vals.mat.tab \\
+        --outFileName ${name}.gz \\
         --numberOfProcessors $task.cpus
 
     cat <<-END_VERSIONS > versions.yml
